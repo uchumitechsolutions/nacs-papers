@@ -24,7 +24,7 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Hot reloading with Vite integration for seamless full-stack development
 
 ## Database Design
-- **Schema**: Drizzle ORM with PostgreSQL dialect for type-safe database operations
+- **Schema**: Drizzle ORM with PostgreSQL dialect for type-safe database operations (Note: MySQL conversion is not supported due to Replit's locked configuration)
 - **Tables**: 
   - Past papers with metadata (title, subject, grade, price, file information)
   - Sales tracking with customer details and payment information
