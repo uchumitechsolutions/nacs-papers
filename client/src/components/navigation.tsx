@@ -75,11 +75,11 @@ export default function Navigation({ cartCount, onCartToggle }: NavigationProps)
   return (
     <nav className="bg-white shadow-sm border-b sticky top-0 z-50" data-testid="navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-14 sm:h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link href="/">
-                <h1 className="text-2xl font-bold text-kenyan-green" data-testid="logo">
+                <h1 className="text-xl sm:text-2xl font-bold text-kenyan-green" data-testid="logo">
                   Nacs Consortium
                 </h1>
               </Link>
@@ -104,16 +104,16 @@ export default function Navigation({ cartCount, onCartToggle }: NavigationProps)
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={onCartToggle}
               className="relative p-2 text-gray-600 hover:text-kenyan-green transition-colors"
               data-testid="button-cart"
             >
-              <ShoppingCart className="w-6 h-6" />
+              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
               {cartCount > 0 && (
                 <span
-                  className="absolute -top-1 -right-1 bg-warm-orange text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  className="absolute -top-1 -right-1 bg-warm-orange text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center"
                   data-testid="text-cart-count"
                 >
                   {cartCount}

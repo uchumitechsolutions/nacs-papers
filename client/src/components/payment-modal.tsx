@@ -126,11 +126,11 @@ export default function PaymentModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4" data-testid="payment-modal">
-      <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4" data-testid="payment-modal">
+      <div className="bg-white rounded-xl max-w-md w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 border-b">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold" data-testid="text-payment-title">Complete Payment</h2>
+            <h2 className="text-lg sm:text-xl font-semibold" data-testid="text-payment-title">Complete Payment</h2>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700"
@@ -141,7 +141,7 @@ export default function PaymentModal({
           </div>
         </div>
         
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <span>Subtotal:</span>
@@ -156,7 +156,7 @@ export default function PaymentModal({
           <div className="mb-6">
             <h3 className="font-semibold mb-4">Choose Payment Method</h3>
             <div className="space-y-3">
-              <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-green-50">
+              <label className="flex items-center p-3 sm:p-4 border rounded-lg cursor-pointer hover:bg-green-50">
                 <input
                   type="radio"
                   name="payment"
@@ -177,7 +177,7 @@ export default function PaymentModal({
                 </div>
               </label>
               
-              <label className="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-blue-50">
+              <label className="flex items-center p-3 sm:p-4 border rounded-lg cursor-pointer hover:bg-blue-50">
                 <input
                   type="radio"
                   name="payment"

@@ -25,17 +25,17 @@ export default function Home({ onAddToCart }: HomeProps) {
   return (
     <div data-testid="page-home">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-kenyan-green to-green-600 text-white py-16 lg:py-24">
+      <section className="bg-gradient-to-r from-kenyan-green to-green-600 text-white py-12 sm:py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div>
-              <h1 className="text-4xl lg:text-6xl font-bold mb-6" data-testid="text-hero-title">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4 lg:mb-6" data-testid="text-hero-title">
                 Master CBC Curriculum with Past Papers
               </h1>
-              <p className="text-xl mb-8 text-green-100" data-testid="text-hero-description">
+              <p className="text-lg sm:text-xl mb-6 lg:mb-8 text-green-100" data-testid="text-hero-description">
                 Access comprehensive past papers for all CBC levels. Pay securely with M-Pesa or Visa and get instant email delivery.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 lg:gap-4">
                 <Link href="/browse">
                   <Button 
                     size="lg" 
@@ -70,17 +70,17 @@ export default function Home({ onAddToCart }: HomeProps) {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4" data-testid="text-features-title">
+          <div className="text-center mb-8 lg:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4" data-testid="text-features-title">
               Why Choose Nacs Consortium?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto" data-testid="text-features-description">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto" data-testid="text-features-description">
               We provide the most comprehensive and affordable CBC past papers in Kenya
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             <div className="text-center p-6 bg-gray-50 rounded-xl" data-testid="feature-mpesa">
               <div className="bg-kenyan-green text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Smartphone className="w-8 h-8" />
@@ -107,24 +107,24 @@ export default function Home({ onAddToCart }: HomeProps) {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-kenyan-green text-white">
+      <section className="py-12 sm:py-16 bg-kenyan-green text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8 text-center">
             <div data-testid="stat-papers">
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-green-200">Past Papers Available</div>
+              <div className="text-2xl sm:text-4xl font-bold mb-2">500+</div>
+              <div className="text-sm sm:text-base text-green-200">Past Papers Available</div>
             </div>
             <div data-testid="stat-students">
-              <div className="text-4xl font-bold mb-2">2,000+</div>
-              <div className="text-green-200">Happy Students</div>
+              <div className="text-2xl sm:text-4xl font-bold mb-2">2,000+</div>
+              <div className="text-sm sm:text-base text-green-200">Happy Students</div>
             </div>
             <div data-testid="stat-success">
-              <div className="text-4xl font-bold mb-2">98%</div>
-              <div className="text-green-200">Success Rate</div>
+              <div className="text-2xl sm:text-4xl font-bold mb-2">98%</div>
+              <div className="text-sm sm:text-base text-green-200">Success Rate</div>
             </div>
             <div data-testid="stat-counties">
-              <div className="text-4xl font-bold mb-2">47</div>
-              <div className="text-green-200">Counties Served</div>
+              <div className="text-2xl sm:text-4xl font-bold mb-2">47</div>
+              <div className="text-sm sm:text-base text-green-200">Counties Served</div>
             </div>
           </div>
         </div>

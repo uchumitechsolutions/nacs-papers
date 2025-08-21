@@ -21,14 +21,14 @@ export default function ShoppingCart({
 }: ShoppingCartProps) {
   return (
     <div
-      className={`fixed inset-y-0 right-0 z-50 w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
+      className={`fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${
         isOpen ? "translate-x-0" : "translate-x-full"
       }`}
       data-testid="shopping-cart"
     >
       <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold" data-testid="text-cart-title">Shopping Cart</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b">
+          <h2 className="text-lg sm:text-xl font-semibold" data-testid="text-cart-title">Shopping Cart</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
@@ -38,7 +38,7 @@ export default function ShoppingCart({
           </button>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500">
               <ShoppingBag className="w-16 h-16 mb-4" />
@@ -82,7 +82,7 @@ export default function ShoppingCart({
         </div>
         
         {items.length > 0 && (
-          <div className="border-t p-6">
+          <div className="border-t p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
               <span className="text-lg font-semibold">Total:</span>
               <span className="text-2xl font-bold text-kenyan-green" data-testid="text-cart-total">

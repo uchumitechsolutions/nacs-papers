@@ -117,18 +117,18 @@ export default function Browse({ onAddToCart }: BrowseProps) {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
           {/* Filters Sidebar */}
-          <div className="lg:w-64 bg-white p-6 rounded-xl shadow-sm h-fit" data-testid="filters-sidebar">
+          <div className="lg:w-64 bg-white p-4 lg:p-6 rounded-xl shadow-sm h-fit" data-testid="filters-sidebar">
             <div className="flex items-center mb-6">
               <Filter className="w-5 h-5 mr-2" />
               <h3 className="text-lg font-semibold">Filters</h3>
             </div>
 
             {/* Grade Filter */}
-            <div className="mb-6">
+            <div className="mb-4 lg:mb-6">
               <h4 className="font-semibold mb-3">Grade Level</h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="space-y-2 max-h-32 lg:max-h-48 overflow-y-auto">
                 {GRADES.map((grade) => {
                   const count = papers.filter(p => p.grade === grade).length;
                   return (
@@ -153,7 +153,7 @@ export default function Browse({ onAddToCart }: BrowseProps) {
             </div>
 
             {/* Subject Filter */}
-            <div className="mb-6">
+            <div className="mb-4 lg:mb-6">
               <h4 className="font-semibold mb-3">Subject</h4>
               <div className="space-y-2">
                 {SUBJECTS.map((subject) => {
@@ -180,7 +180,7 @@ export default function Browse({ onAddToCart }: BrowseProps) {
             </div>
 
             {/* Price Range Filter */}
-            <div className="mb-6">
+            <div className="mb-4 lg:mb-6">
               <h4 className="font-semibold mb-3">Price Range</h4>
               <div className="space-y-2">
                 {[
@@ -229,12 +229,12 @@ export default function Browse({ onAddToCart }: BrowseProps) {
 
           {/* Papers Grid */}
           <div className="flex-1">
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-gray-600" data-testid="text-results-count">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div className="text-sm sm:text-base text-gray-600" data-testid="text-results-count">
                 Showing {sortedPapers.length} of {papers.length} past papers
               </div>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-64" data-testid="select-sort">
+                <SelectTrigger className="w-full sm:w-64" data-testid="select-sort">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
