@@ -8,9 +8,10 @@ import PastPaperCard from "@/components/past-paper-card";
 
 interface HomeProps {
   onAddToCart: (item: CartItem) => void;
+  onBuyNow: (item: CartItem) => void;
 }
 
-export default function Home({ onAddToCart }: HomeProps) {
+export default function Home({ onAddToCart, onBuyNow }: HomeProps) {
   const { data: papers = [] } = useQuery<PastPaper[]>({
     queryKey: ["/api/past-papers"],
   });
@@ -18,8 +19,7 @@ export default function Home({ onAddToCart }: HomeProps) {
   const featuredPapers = papers.slice(0, 3);
 
   const handleBuyNow = (item: CartItem) => {
-    onAddToCart(item);
-    // In a real app, you would open the payment modal directly
+    onBuyNow(item);
   };
 
   return (

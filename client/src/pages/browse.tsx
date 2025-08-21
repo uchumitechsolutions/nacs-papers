@@ -13,9 +13,10 @@ import { Search, Filter } from "lucide-react";
 
 interface BrowseProps {
   onAddToCart: (item: CartItem) => void;
+  onBuyNow: (item: CartItem) => void;
 }
 
-export default function Browse({ onAddToCart }: BrowseProps) {
+export default function Browse({ onAddToCart, onBuyNow }: BrowseProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGrades, setSelectedGrades] = useState<string[]>([]);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
@@ -27,8 +28,7 @@ export default function Browse({ onAddToCart }: BrowseProps) {
   });
 
   const handleBuyNow = (item: CartItem) => {
-    onAddToCart(item);
-    // In a real app, you would open the payment modal directly
+    onBuyNow(item);
   };
 
   const handleGradeChange = (grade: string, checked: boolean) => {

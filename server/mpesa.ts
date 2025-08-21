@@ -32,7 +32,9 @@ export class MpesaService {
 
   constructor(config: MpesaConfig) {
     this.config = config;
-    this.baseUrl = config.environment === 'production' 
+    // Check if environment string matches production (case insensitive)
+    const isProd = config.environment.toLowerCase() === 'production';
+    this.baseUrl = isProd
       ? 'https://api.safaricom.co.ke'
       : 'https://sandbox.safaricom.co.ke';
   }
@@ -53,6 +55,7 @@ export class MpesaService {
       
       console.log(`Requesting access token from: ${this.baseUrl}/oauth/v1/generate`);
       console.log(`Using environment: ${this.config.environment}`);
+      console.log(`Base URL: ${this.baseUrl}`);
       
       const response = await fetch(`${this.baseUrl}/oauth/v1/generate?grant_type=client_credentials`, {
         method: 'GET',
@@ -263,7 +266,7 @@ export function createMpesaService(): MpesaService {
     consumerSecret: process.env.MPESA_CONSUMER_SECRET || '',
     businessShortCode: process.env.MPESA_BUSINESS_SHORT_CODE || '',
     passkey: process.env.MPESA_PASSKEY || '',
-    environment: (process.env.MPESA_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox'
+    environment: (process.env.MPESA_ENVIRONMENT?.toLowerCase() as 'sandbox' | 'production') || 'sandbox'
   };
 
   // Validate required environment variables

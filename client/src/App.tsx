@@ -30,6 +30,11 @@ function Router() {
     setCart(prev => [...prev, item]);
   };
 
+  const buyNow = (item: CartItem) => {
+    setCart([item]); // Set cart to only contain this item
+    setIsPaymentModalOpen(true); // Open payment modal immediately
+  };
+
   const removeFromCart = (id: string) => {
     setCart(prev => prev.filter(item => item.id !== id));
   };
@@ -68,8 +73,8 @@ function Router() {
       />
 
       <Switch>
-        <Route path="/" component={() => <Home onAddToCart={addToCart} />} />
-        <Route path="/browse" component={() => <Browse onAddToCart={addToCart} />} />
+        <Route path="/" component={() => <Home onAddToCart={addToCart} onBuyNow={buyNow} />} />
+        <Route path="/browse" component={() => <Browse onAddToCart={addToCart} onBuyNow={buyNow} />} />
         <Route path="/account" component={Account} />
         <Route path="/auth" component={AuthPage} />
         <Route path="/admin" component={Admin} />

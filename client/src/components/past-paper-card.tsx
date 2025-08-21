@@ -12,7 +12,7 @@ interface PastPaperCardProps {
 
 export default function PastPaperCard({ paper, onAddToCart, onBuyNow }: PastPaperCardProps) {
   const cartItem: CartItem = {
-    id: paper.id,
+    id: paper.id.toString(),
     title: paper.title,
     grade: paper.grade,
     price: paper.price,
