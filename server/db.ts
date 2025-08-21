@@ -1,14 +1,11 @@
-import { drizzle } from "drizzle-orm/mysql2";
-import mysql from "mysql2/promise";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import * as schema from "@shared/schema";
 
-// Create MySQL connection
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root', 
-  password: '',
-  database: 'nacs_consortium',
-  multipleStatements: true
-});
+// Use Replit's DATABASE_URL or fallback for development
+const databaseUrl = process.env.DATABASE_URL || "postgresql://user:password@localhost:5432/nacs_consortium";
 
-export const db = drizzle(await connection, { schema, mode: "default" });
+// Create PostgreSQL connection
+const connection = postgres(databaseUrl);
+
+export const db = drizzle(connection, { schema });

@@ -149,6 +149,7 @@ export class MemStorage implements IStorage {
       id,
       status: "completed",
       createdAt: new Date(),
+      paperIds: Array.isArray(sale.paperIds) ? sale.paperIds as number[] : []
     };
     this.sales.set(id, newSale);
     return newSale;
@@ -186,6 +187,8 @@ export class MemStorage implements IStorage {
     const newUser: User = {
       ...user,
       id,
+      firstName: user.firstName ?? null,
+      lastName: user.lastName ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -198,6 +201,9 @@ export class MemStorage implements IStorage {
     const newPurchase: UserPurchase = {
       ...purchase,
       id,
+      userId: purchase.userId ?? null,
+      paperId: purchase.paperId ?? null,
+      saleId: purchase.saleId ?? null,
       purchasedAt: new Date(),
     };
     this.userPurchases.set(id, newPurchase);

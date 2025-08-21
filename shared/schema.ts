@@ -1,47 +1,47 @@
 import { sql } from "drizzle-orm";
 import { 
-  mysqlTable, 
+  pgTable, 
   text, 
   varchar, 
-  int, 
+  serial, 
   timestamp, 
-  decimal,
-  json
-} from "drizzle-orm/mysql-core";
+  integer,
+  jsonb
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const pastPapers = mysqlTable("past_papers", {
-  id: int("id").primaryKey().autoincrement(),
+export const pastPapers = pgTable("past_papers", {
+  id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
   grade: varchar("grade", { length: 50 }).notNull(),
   subject: varchar("subject", { length: 100 }).notNull(),
-  price: int("price").notNull(), // Price in KSh
+  price: integer("price").notNull(), // Price in KSh
   fileUrl: text("file_url").notNull(),
   fileName: varchar("file_name", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const sales = mysqlTable("sales", {
-  id: int("id").primaryKey().autoincrement(),
+export const sales = pgTable("sales", {
+  id: serial("id").primaryKey(),
   customerEmail: varchar("customer_email", { length: 255 }).notNull(),
-  paperIds: json("paper_ids").notNull(),
-  totalAmount: int("total_amount").notNull(),
+  paperIds: jsonb("paper_ids").$type<number[]>().notNull(),
+  totalAmount: integer("total_amount").notNull(),
   paymentMethod: varchar("payment_method", { length: 50 }).notNull(),
   status: varchar("status", { length: 50 }).notNull().default("completed"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const admin = mysqlTable("admin", {
-  id: int("id").primaryKey().autoincrement(),
+export const admin = pgTable("admin", {
+  id: serial("id").primaryKey(),
   username: varchar("username", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
 });
 
 // Users table for regular authentication
-export const users = mysqlTable("users", {
-  id: int("id").primaryKey().autoincrement(),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   username: varchar("username", { length: 255 }).notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
@@ -52,11 +52,11 @@ export const users = mysqlTable("users", {
 });
 
 // User purchases table to track what papers a user has bought
-export const userPurchases = mysqlTable("user_purchases", {
-  id: int("id").primaryKey().autoincrement(),
-  userId: int("user_id").references(() => users.id),
-  paperId: int("paper_id").references(() => pastPapers.id),
-  saleId: int("sale_id").references(() => sales.id),
+export const userPurchases = pgTable("user_purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  paperId: integer("paper_id").references(() => pastPapers.id),
+  saleId: integer("sale_id").references(() => sales.id),
   purchasedAt: timestamp("purchased_at").defaultNow(),
 });
 

@@ -149,17 +149,19 @@ export function registerRoutes(app: Express): Server {
       // If user is authenticated, record their purchases
       if (req.isAuthenticated && req.isAuthenticated() && (req as any).user?.id) {
         const userId = (req as any).user.id;
-        for (const paperId of validatedData.paperIds) {
+        const paperIds = Array.isArray(validatedData.paperIds) ? validatedData.paperIds : [];
+        for (const paperId of paperIds) {
           await storage.createUserPurchase({
             userId,
-            paperId,
+            paperId: Number(paperId),
             saleId: sale.id
           });
         }
       }
       
       // Mock email sending
-      console.log(`📧 Email sent to ${sale.customerEmail} with ${sale.paperIds.length} past papers`);
+      const paperIds = Array.isArray(sale.paperIds) ? sale.paperIds : [];
+      console.log(`📧 Email sent to ${sale.customerEmail} with ${paperIds.length} past papers`);
       
       res.status(201).json(sale);
     } catch (error) {
