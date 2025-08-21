@@ -26,6 +26,8 @@ export default function PaymentModal({
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [email, setEmail] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [checkoutRequestId, setCheckoutRequestId] = useState<string>("");
+  const [paymentStatus, setPaymentStatus] = useState<"pending" | "success" | "failed" | null>(null);
   const { toast } = useToast();
 
   // M-Pesa specific fields
@@ -67,49 +69,59 @@ export default function PaymentModal({
     setIsProcessing(true);
 
     try {
-      // Process payment based on method
-      let paymentResponse;
       if (paymentMethod === PAYMENT_METHODS.MPESA) {
-        paymentResponse = await apiRequest("POST", "/api/payments/mpesa", {
+        // M-Pesa STK Push
+        const paymentResponse = await apiRequest("POST", "/api/payments/mpesa", {
           phoneNumber,
           amount: total
         });
+        const paymentResult = await paymentResponse.json();
+
+        if (paymentResult.success) {
+          setCheckoutRequestId(paymentResult.checkoutRequestId);
+          setPaymentStatus("pending");
+          
+          toast({
+            title: "STK Push Sent!",
+            description: "Please complete the payment on your phone. We'll verify the payment automatically.",
+          });
+
+          // Start polling for payment status
+          pollPaymentStatus(paymentResult.checkoutRequestId);
+        } else {
+          throw new Error(paymentResult.message || "M-Pesa payment failed");
+        }
       } else {
-        paymentResponse = await apiRequest("POST", "/api/payments/visa", {
+        // Visa payment (existing mock implementation)
+        const paymentResponse = await apiRequest("POST", "/api/payments/visa", {
           cardNumber,
           expiryDate,
           cvv,
           amount: total
         });
-      }
+        const paymentResult = await paymentResponse.json();
 
-      const paymentResult = await paymentResponse.json();
-
-      if (paymentResult.success) {
-        // Record the sale
-        await apiRequest("POST", "/api/sales", {
-          customerEmail: email,
-          paperIds: cartItems.map(item => item.id),
-          totalAmount: total,
-          paymentMethod
-        });
-
-        toast({
-          title: "Payment Successful!",
-          description: "Your past papers have been sent to your email.",
-        });
-
-        onPaymentSuccess();
-        onClose();
-        resetForm();
+        if (paymentResult.success) {
+          await recordSale();
+          toast({
+            title: "Payment Successful!",
+            description: "Your past papers have been sent to your email.",
+          });
+          onPaymentSuccess();
+          onClose();
+          resetForm();
+        } else {
+          throw new Error("Visa payment failed");
+        }
+        setIsProcessing(false);
       }
     } catch (error) {
+      console.error("Payment error:", error);
       toast({
         title: "Payment Failed",
-        description: "There was an error processing your payment. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsProcessing(false);
     }
   };
@@ -121,6 +133,90 @@ export default function PaymentModal({
     setCardNumber("");
     setExpiryDate("");
     setCvv("");
+    setCheckoutRequestId("");
+    setPaymentStatus(null);
+  };
+
+  // Poll payment status for M-Pesa
+  const pollPaymentStatus = async (requestId: string) => {
+    let attempts = 0;
+    const maxAttempts = 30; // Poll for 5 minutes (30 attempts * 10 seconds)
+    
+    const poll = async () => {
+      try {
+        const response = await apiRequest("POST", "/api/payments/mpesa/query", {
+          checkoutRequestId: requestId
+        });
+        const result = await response.json();
+        
+        if (result.ResultCode === "0") {
+          // Payment successful
+          setPaymentStatus("success");
+          await recordSale();
+          toast({
+            title: "Payment Successful!",
+            description: "Your M-Pesa payment was completed successfully.",
+          });
+          onPaymentSuccess();
+          onClose();
+          resetForm();
+          return;
+        } else if (result.ResultCode && result.ResultCode !== "1037") {
+          // Payment failed (1037 is timeout, continue polling)
+          setPaymentStatus("failed");
+          toast({
+            title: "Payment Failed",
+            description: result.ResultDesc || "M-Pesa payment was not completed.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+          return;
+        }
+        
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 10000); // Poll every 10 seconds
+        } else {
+          // Timeout
+          setPaymentStatus("failed");
+          toast({
+            title: "Payment Timeout",
+            description: "Payment verification timed out. Please try again.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        }
+      } catch (error) {
+        console.error("Payment status polling error:", error);
+        attempts++;
+        if (attempts < maxAttempts) {
+          setTimeout(poll, 10000);
+        } else {
+          setPaymentStatus("failed");
+          toast({
+            title: "Payment Verification Failed",
+            description: "Could not verify payment status. Please contact support.",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        }
+      }
+    };
+    
+    poll();
+  };
+
+  const recordSale = async () => {
+    try {
+      await apiRequest("POST", "/api/sales", {
+        customerEmail: email,
+        paperIds: cartItems.map(item => item.id),
+        totalAmount: total,
+        paymentMethod
+      });
+    } catch (error) {
+      console.error("Failed to record sale:", error);
+    }
   };
 
   if (!isOpen) return null;
@@ -207,12 +303,15 @@ export default function PaymentModal({
               <Input
                 id="phone"
                 type="tel"
-                placeholder="254XXXXXXXXX"
+                placeholder="254XXXXXXXXX or 07XXXXXXXX"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="mt-2"
                 data-testid="input-phone"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter your M-Pesa registered phone number (e.g., 254712345678 or 0712345678)
+              </p>
             </div>
           )}
 
@@ -280,8 +379,37 @@ export default function PaymentModal({
             data-testid="button-pay"
           >
             <Lock className="w-4 h-4 mr-2" />
-            {isProcessing ? "Processing..." : "Complete Secure Payment"}
+            {isProcessing ? (
+              paymentMethod === PAYMENT_METHODS.MPESA && paymentStatus === "pending" 
+                ? "Waiting for phone confirmation..." 
+                : "Processing..."
+            ) : "Complete Secure Payment"}
           </Button>
+
+          {/* Payment Status Indicator */}
+          {paymentStatus === "pending" && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-blue-700 font-medium">Complete payment on your phone</span>
+              </div>
+              <p className="text-sm text-blue-600 mt-2">
+                Check your phone for the M-Pesa STK push notification and enter your PIN to complete the payment.
+              </p>
+            </div>
+          )}
+
+          {paymentStatus === "success" && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <span className="text-green-700 font-medium">✅ Payment completed successfully!</span>
+            </div>
+          )}
+
+          {paymentStatus === "failed" && (
+            <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <span className="text-red-700 font-medium">❌ Payment failed. Please try again.</span>
+            </div>
+          )}
           
           <p className="text-xs text-gray-600 text-center mt-4">
             Your payment is secured with 256-bit SSL encryption. Past papers will be delivered to your email within 5 minutes.

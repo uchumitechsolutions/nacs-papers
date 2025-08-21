@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPastPaperSchema, insertSaleSchema, insertUserSchema, loginUserSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
+import { createMpesaService } from "./mpesa";
 import multer, { FileFilterCallback } from "multer";
 import path from "path";
 
@@ -181,26 +182,106 @@ export function registerRoutes(app: Express): Server {
   // Payment Routes
   app.post("/api/payments/mpesa", async (req, res) => {
     try {
-      // Mock M-Pesa payment processing
       const { phoneNumber, amount } = req.body;
       
-      // Simulate payment processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!phoneNumber || !amount) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Phone number and amount are required" 
+        });
+      }
+
+      // Initialize M-Pesa service
+      const mpesaService = createMpesaService();
       
-      // Mock successful payment
-      res.json({
-        success: true,
-        transactionId: `MP${Date.now()}`,
-        message: "Payment processed successfully via M-Pesa"
+      // Create callback URL (you'll need to implement this endpoint)
+      const callbackUrl = `${req.protocol}://${req.get('host')}/api/payments/mpesa/callback`;
+      
+      // Initiate STK Push
+      const result = await mpesaService.initiateSTKPush({
+        phoneNumber,
+        amount: Number(amount),
+        accountReference: `NACS-${Date.now()}`,
+        transactionDesc: 'CBC Past Papers Purchase',
+        callbackUrl
       });
+
+      if (result.success) {
+        res.json({
+          success: true,
+          checkoutRequestId: result.checkoutRequestId,
+          message: result.customerMessage || "STK Push sent successfully. Please check your phone."
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          message: result.errorMessage || "Failed to initiate M-Pesa payment"
+        });
+      }
     } catch (error) {
-      res.status(500).json({ message: "M-Pesa payment failed" });
+      console.error('M-Pesa payment error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "M-Pesa service is currently unavailable" 
+      });
+    }
+  });
+
+  // M-Pesa callback endpoint
+  app.post("/api/payments/mpesa/callback", (req, res) => {
+    try {
+      console.log('M-Pesa callback received:', JSON.stringify(req.body, null, 2));
+      
+      const { Body } = req.body;
+      if (Body && Body.stkCallback) {
+        const { CheckoutRequestID, ResultCode, ResultDesc } = Body.stkCallback;
+        
+        if (ResultCode === 0) {
+          // Payment successful
+          console.log(`✅ M-Pesa payment successful for CheckoutRequestID: ${CheckoutRequestID}`);
+          // Here you could update your database to mark the payment as successful
+        } else {
+          // Payment failed
+          console.log(`❌ M-Pesa payment failed for CheckoutRequestID: ${CheckoutRequestID}. Reason: ${ResultDesc}`);
+        }
+      }
+      
+      // Always respond with success to acknowledge receipt
+      res.json({ ResultCode: 0, ResultDesc: "Accepted" });
+    } catch (error) {
+      console.error('M-Pesa callback error:', error);
+      res.json({ ResultCode: 1, ResultDesc: "Failed" });
+    }
+  });
+
+  // Query M-Pesa transaction status
+  app.post("/api/payments/mpesa/query", async (req, res) => {
+    try {
+      const { checkoutRequestId } = req.body;
+      
+      if (!checkoutRequestId) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "CheckoutRequestID is required" 
+        });
+      }
+
+      const mpesaService = createMpesaService();
+      const result = await mpesaService.querySTKPushStatus(checkoutRequestId);
+      
+      res.json(result);
+    } catch (error) {
+      console.error('M-Pesa query error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Failed to query payment status" 
+      });
     }
   });
 
   app.post("/api/payments/visa", async (req, res) => {
     try {
-      // Mock Visa payment processing
+      // Mock Visa payment processing (you can integrate with actual payment gateway later)
       const { cardNumber, expiryDate, cvv, amount } = req.body;
       
       // Simulate payment processing delay
