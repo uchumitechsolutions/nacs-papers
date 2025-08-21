@@ -184,6 +184,8 @@ export function registerRoutes(app: Express): Server {
     try {
       const { phoneNumber, amount } = req.body;
       
+      console.log(`📥 M-Pesa payment request received:`, { phoneNumber, amount });
+      
       if (!phoneNumber || !amount) {
         return res.status(400).json({ 
           success: false, 
@@ -191,38 +193,57 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
-      // Initialize M-Pesa service
-      const mpesaService = createMpesaService();
-      
-      // Create callback URL (you'll need to implement this endpoint)
-      const callbackUrl = `${req.protocol}://${req.get('host')}/api/payments/mpesa/callback`;
-      
-      // Initiate STK Push
-      const result = await mpesaService.initiateSTKPush({
-        phoneNumber,
-        amount: Number(amount),
-        accountReference: `NACS-${Date.now()}`,
-        transactionDesc: 'CBC Past Papers Purchase',
-        callbackUrl
-      });
-
-      if (result.success) {
-        res.json({
-          success: true,
-          checkoutRequestId: result.checkoutRequestId,
-          message: result.customerMessage || "STK Push sent successfully. Please check your phone."
+      // Validate amount
+      const numericAmount = Number(amount);
+      if (isNaN(numericAmount) || numericAmount <= 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid amount. Amount must be a positive number" 
         });
-      } else {
-        res.status(400).json({
-          success: false,
-          message: result.errorMessage || "Failed to initiate M-Pesa payment"
+      }
+
+      // Initialize M-Pesa service
+      try {
+        const mpesaService = createMpesaService();
+        
+        // Create callback URL
+        const callbackUrl = `${req.protocol}://${req.get('host')}/api/payments/mpesa/callback`;
+        
+        console.log(`🔗 Callback URL: ${callbackUrl}`);
+        
+        // Initiate STK Push
+        const result = await mpesaService.initiateSTKPush({
+          phoneNumber,
+          amount: numericAmount,
+          accountReference: `NACS-${Date.now()}`,
+          transactionDesc: 'CBC Past Papers Purchase',
+          callbackUrl
+        });
+
+        if (result.success) {
+          res.json({
+            success: true,
+            checkoutRequestId: result.checkoutRequestId,
+            message: result.customerMessage || "STK Push sent successfully. Please check your phone."
+          });
+        } else {
+          res.status(400).json({
+            success: false,
+            message: result.errorMessage || "Failed to initiate M-Pesa payment"
+          });
+        }
+      } catch (serviceError) {
+        console.error('M-Pesa service initialization error:', serviceError);
+        res.status(500).json({ 
+          success: false, 
+          message: serviceError instanceof Error ? serviceError.message : "M-Pesa service configuration error"
         });
       }
     } catch (error) {
-      console.error('M-Pesa payment error:', error);
+      console.error('M-Pesa payment route error:', error);
       res.status(500).json({ 
         success: false, 
-        message: "M-Pesa service is currently unavailable" 
+        message: "Internal server error. Please try again later."
       });
     }
   });

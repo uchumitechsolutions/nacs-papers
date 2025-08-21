@@ -303,14 +303,17 @@ export default function PaymentModal({
               <Input
                 id="phone"
                 type="tel"
-                placeholder="254XXXXXXXXX or 07XXXXXXXX"
+                placeholder="254712345678 or 0712345678"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 className="mt-2"
                 data-testid="input-phone"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Enter your M-Pesa registered phone number (e.g., 254712345678 or 0712345678)
+                Enter your M-Pesa registered phone number. Supported formats:<br/>
+                • 254712345678 (international)<br/>
+                • 0712345678 (local)<br/>
+                • +254712345678 (with country code)
               </p>
             </div>
           )}

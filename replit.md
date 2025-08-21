@@ -42,9 +42,12 @@ Preferred communication style: Simple, everyday language.
 - **Purchase History**: Authenticated users can view their past purchases and download PDFs
 
 ## Payment Processing
-- **Methods**: M-Pesa and Visa integration for local and international payments
+- **M-Pesa Integration**: Real Safaricom Daraja API integration with STK Push for Kenyan mobile payments
+- **Payment Flow**: Shopping cart -> payment modal -> STK Push -> real-time verification -> purchase completion
+- **Phone Validation**: Supports multiple Kenyan phone number formats (254XXXXXXXXX, 07XXXXXXXX, +254XXXXXXXXX)
+- **Status Tracking**: Real-time payment status polling with user-friendly feedback
+- **Visa Payments**: Mock integration ready for real payment gateway integration
 - **Validation**: Zod schemas for payment data validation and type safety
-- **Flow**: Shopping cart -> payment modal -> secure processing -> email delivery
 
 ## File Management
 - **Upload**: PDF-only file uploads with 10MB size limits
